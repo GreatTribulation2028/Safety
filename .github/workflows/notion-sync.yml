@@ -1,0 +1,30 @@
+name: Notion2Github
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # 每天 UTC 00:00 自動同步
+  workflow_dispatch:        # 也可以手動觸發
+
+jobs:
+  auto-sync-from-notion-to-github:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Notion2Github
+        uses: younho9/notion2github@v1.1.0
+        with:
+          database-url: 'https://www.notion.so/AI-Safety-2f4f133f651f80039826e5100d47801a'
+          docs-directory: docs
+        env:
+          NOTION_TOKEN: ${{ secrets.NOTION_TOKEN }}
+
+      - name: Format and commit documents
+        uses: creyD/prettier_action@v4.3
+        with:
+          prettier_options: --write ./docs/**/*.md
+          commit_message: 'docs: Sync from Notion (auto)'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
